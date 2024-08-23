@@ -1,6 +1,7 @@
 "use client"
-import { Download } from "lucide-react"
+import { Download, FlaskConical } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -96,6 +97,7 @@ export function ExportButton({docId, setError}: {docId: string, setError: (error
       const formData = new FormData();
       formData.append('file', data.fdata);
       formData.append('shapes', JSON.stringify(shapes));
+      formData.append('ftype', data.ftype);
 
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_EXPORT_SERVER_ADDR}/annotate_pdf`, {
@@ -153,7 +155,10 @@ export function ExportButton({docId, setError}: {docId: string, setError: (error
       <DropdownMenuContent>
         <DropdownMenuItem onClick={handleJSON}>JSON</DropdownMenuItem>
         <DropdownMenuItem onClick={handleCSV}>CSV</DropdownMenuItem>
-        <DropdownMenuItem onClick={handlePDF}>PDF</DropdownMenuItem>
+        <DropdownMenuItem onClick={handlePDF}>
+          PDF (Beta)
+          <FlaskConical className="w-4 h-4 ml-2" />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

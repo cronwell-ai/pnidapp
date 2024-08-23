@@ -21,23 +21,38 @@ def getMetadataString(shape):
         return metadata_string
     return "None"
 
-def add_shapes_to_pdf(input_pdf, shapes):
+def add_shapes_to_pdf(input_file, ftype, shapes):
     # Open the PDF
-    doc = fitz.open(stream=input_pdf, filetype="pdf")
-    
+    if ftype != "pdf":
+        # Convert image to PDF
+        doc = fitz.open()
+        img = fitz.open(stream=input_file, filetype=ftype)
+        pdfbytes = img.convert_to_pdf()
+        img.close()
+
+        # Open the converted PDF
+        doc = fitz.open("pdf", pdfbytes)
+    else:
+        # Open the existing PDF
+        doc = fitz.open(stream=input_file, filetype="pdf")
+
     # Iterate through each page (assuming shapes are for the first page only)
     page = doc[0]
-    page_width = page.rect.width 
+    page_width = page.rect.width
+    page_height = page.rect.height
+    app.logger.info(f'page_width: {page_width}, page_height: {page_height}')
     
     for shape in shapes:
         # Extract shape information
         shape_id = shape['id']
         shape_type = shape['shape']
         color = hex_to_rgb(shape['color'])
-        x = shape['start_x_pos']
-        y = shape['start_y_pos']
-        width = shape['width']
-        height = shape['height']
+        scale = 1.0 if ftype == 'pdf' else 0.5 
+        x = shape['start_x_pos'] * scale
+        y = shape['start_y_pos'] * scale
+        app.logger.info(f'shape type: {shape_type} --> x: {x}, y: {y}')
+        width = shape['width'] * scale
+        height = shape['height'] * scale
         title = shape['title']
         metadata_string = getMetadataString(shape)
         
@@ -45,7 +60,12 @@ def add_shapes_to_pdf(input_pdf, shapes):
         mirrored_x = page_width - (x + width)
         
         # Create annotation
-        rect = fitz.Rect(y, mirrored_x, y + height, mirrored_x + width)
+        if page_width > 1500:
+            rect = fitz.Rect(y, mirrored_x, y + height, mirrored_x + width)
+        else :
+            # rect = fitz.Rect(y, mirrored_x, y + height, mirrored_x + width)
+            # rect = fitz.Rect(y, mirrored_x, y + height, mirrored_x + width)
+            rect = fitz.Rect(x, y, x + width, y + height)
         
         if shape_type == 'rectangle':
             annot = page.add_rect_annot(rect)
@@ -78,6 +98,9 @@ def annotate_pdf():
         return 'Missing file or shapes data', 400
     
     file = request.files['file']
+    ftype = request.form['ftype']
+    file_type = ftype.split('/')[-1]
+    app.logger.info(f'ftype: {ftype}')
     shapes = json.loads(request.form['shapes'])
     
     if file.filename == '':
@@ -85,7 +108,7 @@ def annotate_pdf():
     
     if file:
         input_pdf = file.read()
-        output_pdf = add_shapes_to_pdf(input_pdf, shapes)
+        output_pdf = add_shapes_to_pdf(input_pdf, file_type, shapes)
         
         return send_file(
             io.BytesIO(output_pdf),
