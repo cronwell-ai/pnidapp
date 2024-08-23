@@ -1,0 +1,31 @@
+version: '3'
+services:
+  pnid-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - metadata-parser
+      - pdf-export
+    ports:
+      - "3000:3000"
+  
+  metadata-parser:
+    build:
+      context: ./companion/metadata-parser
+      dockerfile: Dockerfile
+    environment:
+      - USE_HTTPS=false
+      - PORT=5000
+      - SUPABASE_URL= # IMPORTANT: Add your Supabase URL here
+      - SUPABASE_SERVICE_KEY= # IMPORTANT: Add your Supabase Service Key here
+      - OPENAI_API_KEY= # IMPORTANT: Add your OpenAI API Key here
+    ports:
+      - "7123:5000"
+
+  pdf-export:
+    build:
+      context: ./companion/pdf-export
+      dockerfile: Dockerfile
+    ports:
+      - "6123:5000"
