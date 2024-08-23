@@ -90,7 +90,7 @@ export default async function Page() {
       <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 lg:flex lg:px-2 lg:pt-32">
         <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0 lg:pt-16">
           <div className='flex items-center justify-between'>
-            <GithubStarButton user='cronwell-ai' repo='pnid-app' />
+            <GithubStarButton user='cronwell-ai' repo='pnidapp' />
             <TooltipProvider delayDuration={100}>
               <Tooltip>
                 <TooltipTrigger asChild>
