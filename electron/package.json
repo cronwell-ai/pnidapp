@@ -1,0 +1,72 @@
+{
+  "name": "pnidapp-desktop",
+  "productName": "P&ID App",
+  "version": "0.1.0",
+  "description": "Desktop application for P&ID labeling",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "concurrently \"cd .. && pnpm dev\" \"electron .\"",
+    "build": "electron-builder",
+    "pack:mac": "electron-builder --mac",
+    "pack:win": "electron-builder --win",
+    "pack:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.pnidapp.desktop",
+    "productName": "P&ID App",
+    "copyright": "Copyright © 2025",
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "target": [
+        "dmg"
+      ],
+      "icon": "build/icon.icns"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Graphics"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../companion",
+        "to": "companion",
+        "filter": ["**/*", "!**/node_modules/**", "!**/.venv/**"]
+      }
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    }
+  },
+  "author": {
+    "name": "P&ID App Team",
+    "email": "info@pnidapp.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  }
+}

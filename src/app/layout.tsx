@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider"
 import QueryProvider from "@/lib/reactquery/provider"
 import { Toaster } from "@/components/ui/toaster"
+import { ElectronProvider } from "@/lib/electron"
 
 import { cn } from "@/lib/utils"
  
@@ -34,7 +35,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <QueryProvider>
-              {children}
+              <ElectronProvider>
+                {children}
+              </ElectronProvider>
             </QueryProvider>
           </ThemeProvider>
           <Toaster />

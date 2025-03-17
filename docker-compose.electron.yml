@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  electron-builder:
+    image: electronuserland/builder:18
+    volumes:
+      - .:/project
+    working_dir: /project
+    environment:
+      - ELECTRON_CACHE=/root/.cache/electron
+      - ELECTRON_BUILDER_CACHE=/root/.cache/electron-builder
+      - GH_TOKEN=${GH_TOKEN:-}  # For code signing if needed
+      - CSC_IDENTITY_AUTO_DISCOVERY=false  # Disable auto code signing in dev
+    command: >
+      bash -c "
+        echo '⚡ Installing dependencies...' &&
+        pnpm install &&
+        
+        echo '⚡ Building Next.js application...' &&
+        pnpm build &&
+        
+        echo '⚡ Building Electron application...' &&
+        cd electron &&
+        pnpm install &&
+        pnpm build &&
+        
+        echo '⚡ Packaging application...' &&
+        rm -rf /project/dist &&
+        mkdir -p /project/dist &&
+        cp -r dist/* /project/dist/ &&
+        
+        echo '✅ Build complete! Check the ./dist directory for your app'
+      "

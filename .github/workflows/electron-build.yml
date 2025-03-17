@@ -1,0 +1,63 @@
+name: Build Electron Apps
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.6.3
+          
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: Build Next.js app
+        run: pnpm build
+        
+      - name: Build Electron app
+        run: |
+          cd electron
+          pnpm install
+          pnpm pack:${{ matrix.os == 'macos-latest' && 'mac' || matrix.os == 'windows-latest' && 'win' || 'linux' }}
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}-build
+          path: electron/dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/macos-latest-build/PNID-App*.dmg
+            artifacts/windows-latest-build/PNID-App*.exe
+            artifacts/ubuntu-latest-build/PNID-App*.AppImage
+          generate_release_notes: true

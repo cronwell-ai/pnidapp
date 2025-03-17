@@ -1,0 +1,60 @@
+name: Verify Documentation
+
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sundays
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          
+      - name: Install link checker
+        run: npm install -g markdown-link-check
+        
+      - name: Check README links
+        run: markdown-link-check README.md
+        
+      - name: Check documentation links
+        run: |
+          find ./docs -name "*.md" -type f -exec markdown-link-check {} \;
+          
+      - name: Report Results
+        if: always()
+        run: |
+          echo "Documentation verification completed"
+          echo "Check the logs above for any broken links"
+  
+  check-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Verify script permissions
+        run: |
+          find ./scripts -name "*.sh" -type f -exec test -x {} \; || { 
+            echo "Warning: Some script files are not executable"; 
+            find ./scripts -name "*.sh" -type f -not -executable;
+            echo "Making scripts executable...";
+            find ./scripts -name "*.sh" -type f -exec chmod +x {} \;
+          }
+      
+      - name: Validate script syntax
+        run: |
+          find ./scripts -name "*.sh" -type f -exec bash -n {} \; || {
+            echo "Error: Some scripts have syntax errors";
+            exit 1;
+          }

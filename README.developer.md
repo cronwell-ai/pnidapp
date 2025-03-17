@@ -1,14 +1,15 @@
 # PNID App Developer Guide
 
-This guide provides detailed information for developers working on the PNID.app codebase. It covers local development setup, architecture overview, and troubleshooting tips.
+This guide provides detailed information for developers working on the PNID.app codebase. It covers local development setup, architecture overview, and troubleshooting tips for both web and desktop applications.
 
 ## Architecture Overview
 
-PNID.app consists of three main components:
+PNID.app consists of four main components:
 
 1. **Next.js Frontend/Backend** (port 3000): The main application that handles UI, authentication, and data management.
 2. **Metadata Parser Service** (port 7123): An Express.js service for AI-assisted metadata extraction using OpenAI.
 3. **PDF Export Service** (port 6123): A Flask service for generating PDF exports of labeled P&IDs.
+4. **Electron Desktop Application**: An optional wrapper that packages the web application and companion services into a native desktop experience.
 
 All these components connect to a Supabase backend that provides database, authentication, and storage services.
 
@@ -152,9 +153,80 @@ For better security:
      - Pushing to Docker Hub
      - Deploying to production server
 
+## Electron Desktop Application
+
+The Electron application provides a native desktop experience by wrapping the Next.js application along with its companion services.
+
+### Electron Architecture
+
+- **Main Process** (`electron/main.js`): Handles application lifecycle, OS integration, and companion service management
+- **Renderer Process**: The Next.js application running within an Electron BrowserWindow
+- **Preload Script** (`electron/preload.js`): Secure bridge between main and renderer processes
+- **IPC Communication**: Allows secure communication between the main and renderer processes
+
+### Electron Development
+
+1. **Setup for Electron Development**
+   ```bash
+   # Install dependencies
+   cd electron
+   pnpm install
+   ```
+
+2. **Running Electron in Development Mode**
+   ```bash
+   # First ensure all services are running:
+   # - Next.js on port 3000
+   # - Metadata parser on port 7123
+   # - PDF export on port 6123
+   
+   # Then start Electron
+   cd electron
+   pnpm dev
+   ```
+
+3. **Building Electron Application**
+   ```bash
+   # Build Next.js first
+   pnpm build
+   
+   # Then build Electron
+   cd electron
+   pnpm build
+   ```
+
+4. **Creating Distribution Packages**
+   ```bash
+   cd electron
+   
+   # For macOS
+   pnpm pack:mac
+   
+   # For Windows
+   pnpm pack:win
+   
+   # For Linux
+   pnpm pack:linux
+   ```
+
+### Electron Development Guidelines
+
+- All Electron-specific code should be isolated in the `/src/lib/electron` directory
+- Use the `useElectron()` hook to safely access Electron features
+- Always provide web fallbacks for Electron-specific functionality
+- Follow security best practices detailed in the [Electron Security Guidelines](./docs/electron-security.md)
+
+For detailed documentation on the Electron implementation, refer to:
+- [Electron Setup Guide](./docs/electron-setup.md)
+- [Electron Testing Guide](./docs/electron-testing.md)
+- [Electron Building Guide](./docs/electron-build.md)
+- [Electron Troubleshooting](./docs/electron-troubleshooting.md)
+
 ## References
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Supabase Documentation](https://supabase.io/docs)
 - [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
 - [PyMuPDF Documentation](https://pymupdf.readthedocs.io/)
+- [Electron Documentation](https://www.electronjs.org/docs/latest)
+- [Electron Builder Documentation](https://www.electron.build/)

@@ -17,9 +17,14 @@ PNID.app is a powerful tool for labeling and managing Process and Instrumentatio
 - **Export Functionality**: Export labeled P&IDs to PDF format.
 
 ## Usage
-This application is available in two formats:
+This application is available in three formats:
 
 * **Online Version:** Access the app directly at [beta.pnid.app](beta.pnid.app). This version is hosted and maintained by our team and is meant for users who want to try it out immediately.
+* **Desktop Application:** Native application with offline capabilities and improved file handling.
+  * **Coming Soon:** Desktop applications for macOS, Windows, and Linux
+  * Check our [Releases page](https://github.com/cronwell-ai/pnidapp/releases) for available downloads
+  * See [Installation Guide](./docs/installation-guide.md) for installation instructions
+  * See [Electron Quick Start](./docs/electron-quick-start.md) for building from source
 * **Self-Hosted Version:** For users who require more control over their data or need to integrate the app into their own infrastructure, we offer a self-hosted option. Follow the self-hosting guide in the next section to set up your own instance of the application.
 
 Choose the option that best suits your needs and security requirements.
@@ -101,6 +106,15 @@ For comprehensive instructions, refer to our documentation:
 - [Docker Workflow Guide](./docs/docker-workflow.md) - Docker usage in different environments
 - [Production Deployment Guide](./docs/production-deployment.md) - Deployment instructions
 - [CI/CD Pipeline Guide](./docs/ci-cd-guide.md) - Automated deployment workflow
+
+#### Desktop Application Development
+
+For building and testing the macOS desktop application:
+
+- [Electron Setup Guide](./docs/electron-setup.md) - Desktop app setup instructions
+- [Electron Testing Guide](./docs/electron-testing.md) - Test procedures for the desktop app
+- [Electron Building Guide](./docs/electron-build.md) - Desktop app packaging and distribution
+- [Electron Security Guidelines](./docs/electron-security.md) - Security best practices
 
 
 ## Roadmap
